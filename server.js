@@ -15,9 +15,10 @@ const Post = require("./models/Post");
 dotenv.config();
 
 const httpServer = require("http").createServer(app);
+
 const io = require("socket.io")(httpServer, {
   cors: {
-    origin: ["http://localhost:3000", "https://post-it-heroku.herokuapp.com"],
+    origin: ["http://localhost:3000", "https://social-app-gilt-one.vercel.app"],
   },
 });
 
