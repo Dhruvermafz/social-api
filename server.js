@@ -21,6 +21,7 @@ const io = require("socket.io")(httpServer, {
     origins: [
       "http://localhost:3000",
       "https://social-app-gilt-one.vercel.app",
+      "https://itsablog.vercel.app",
     ],
 
     handlePreflightRequest: (req, res) => {
