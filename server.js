@@ -1,20 +1,23 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const dotenv = require("dotenv");
+require("dotenv").config();
 const cors = require("cors");
 const path = require("path");
+const bodyParser = require("body-parser");
 const app = express();
 const { authSocket, socketServer } = require("./socketServer");
+const morgan = require("morgan");
 const posts = require("./routes/posts");
 const users = require("./routes/users");
 const comments = require("./routes/comments");
 const messages = require("./routes/messages");
-const PostLike = require("./models/PostLike");
-const Post = require("./models/Post");
-
-dotenv.config();
 
 const httpServer = require("http").createServer(app);
+
+app.use(morgan("dev"));
+app.use(express.json());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 const io = require("socket.io")(httpServer, {
   cors: {
@@ -48,10 +51,11 @@ mongoose.connect(
 );
 
 httpServer.listen(process.env.PORT || 4000, () => {
-  console.log("Listening");
+  console.log(
+    `Server is running on PORT: ${process.env.PORT} in ${process.env.NODE_ENV} mode.`
+  );
 });
 
-app.use(express.json());
 app.use(cors());
 app.use("/api/posts", posts);
 app.use("/api/users", users);
@@ -59,9 +63,14 @@ app.use("/api/comments", comments);
 app.use("/api/messages", messages);
 
 if (process.env.NODE_ENV == "production") {
-  app.use(express.static(path.join(__dirname, "/client/build")));
+  app.use(express.static(path.join(__dirname, "./static")));
 
   app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "client/build", "index.html"));
+    res.sendFile(path.join(__dirname, "./templates/", "api.html"));
   });
 }
+
+process.on("unhandledRejection", (err, promise) => {
+  console.error(`Logged Error: ${err}`);
+  server.close(() => process.exit(1));
+});
