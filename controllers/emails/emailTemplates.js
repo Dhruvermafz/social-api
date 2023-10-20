@@ -1,5 +1,4 @@
-const { CLIENT_ORIGIN } = require("../config");
-
+const { CLIENT_ORIGIN } = "http://localhost/4000";
 
 module.exports = {
   confirm: (id) => ({

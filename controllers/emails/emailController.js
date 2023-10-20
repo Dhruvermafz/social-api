@@ -1,7 +1,7 @@
 const User = require("../../models/User");
 const sendEmail = require("../../util/nodemailer");
 const msgs = require("./email.messages");
-const templates = require("./email.templates");
+const templates = require("./emailTemplates");
 
 exports.collectEmail = async (req, res) => {
   const { email } = req.body;

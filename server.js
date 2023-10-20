@@ -12,6 +12,7 @@ const users = require("./routes/users");
 const comments = require("./routes/comments");
 const messages = require("./routes/messages");
 const email = require("./routes/emailConfirmation");
+const notify = require("./routes/notify");
 const httpServer = require("http").createServer(app);
 
 app.use(morgan("dev"));
@@ -62,6 +63,7 @@ app.use("/api/users", users);
 app.use("/api/comments", comments);
 app.use("/api/messages", messages);
 app.use("/email", email);
+app.use("/api/notify", notify);
 
 if (process.env.NODE_ENV == "production") {
   app.use(express.static(path.join(__dirname, "./static")));
