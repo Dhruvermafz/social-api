@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const filter = require("../util/filter");
+const CustomFilter = require("../util/filter");
 const PostLike = require("./PostLike");
 
 const PostSchema = new mongoose.Schema(
@@ -36,12 +36,15 @@ const PostSchema = new mongoose.Schema(
 );
 
 PostSchema.pre("save", function (next) {
+  // Create an instance of the custom filter
+  const customFilter = new CustomFilter();
+
   if (this.title.length > 0) {
-    this.title = filter.clean(this.title);
+    this.title = customFilter.cleanHacked(this.title);
   }
 
   if (this.content.length > 0) {
-    this.content = filter.clean(this.content);
+    this.content = customFilter.cleanHacked(this.content);
   }
 
   next();

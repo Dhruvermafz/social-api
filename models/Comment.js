@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const Post = require("./Post");
-const filter = require("../util/filter");
+const CustomFilter = require("../util/filter");
 
 const CommentSchema = new mongoose.Schema(
   {
@@ -49,7 +49,9 @@ CommentSchema.post("remove", async function (res, next) {
 
 CommentSchema.pre("save", function (next) {
   if (this.content.length > 0) {
-    this.content = filter.clean(this.content);
+    // Create an instance of the custom filter
+    const customFilter = new CustomFilter();
+    this.content = customFilter.cleanHacked(this.content);
   }
 
   next();
