@@ -31,6 +31,12 @@ const PostSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    reports: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: "user",
+      },
+    ],
   },
   { timestamps: true }
 );

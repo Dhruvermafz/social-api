@@ -19,4 +19,9 @@ router.get(
 );
 router.get("/like/:postId/users", postControllers.getUserLikes);
 
+router.patch("/:id/report", postControllers.reportPost);
+router.patch("/savePost/:id", postControllers.savePost);
+router.patch("/unSavePost/:id", postControllers.unSavePost);
+router.get("/getSavePosts", postControllers.getSavePost);
+
 module.exports = router;

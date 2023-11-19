@@ -8,6 +8,13 @@ const cooldown = new Set();
 
 USER_LIKES_PAGE_SIZE = 9;
 
+class ApiFeatures {
+  constructor(query, queryString) {
+    this.query = query;
+    this.queryString = queryString;
+  }
+}
+
 const createPost = async (req, res) => {
   try {
     const { title, content, userId } = req.body;
@@ -330,6 +337,108 @@ const getUserLikes = async (req, res) => {
   }
 };
 
+const handleErrorResponse = (res, status, message) => {
+  return res.status(status).json({ msg: message });
+};
+
+const reportPost = async (req, res) => {
+  try {
+    const existingReport = await Post.findOne({
+      _id: req.params.id,
+      reports: req.user._id,
+    });
+
+    if (existingReport) {
+      return handleErrorResponse(
+        res,
+        400,
+        "You have already reported this post."
+      );
+    }
+
+    const report = await Post.findByIdAndUpdate(
+      req.params.id,
+      { $push: { reports: req.user._id } },
+      { new: true }
+    );
+
+    if (!report) {
+      return handleErrorResponse(res, 400, "Post does not exist.");
+    }
+
+    res.json({ msg: "Post reported successfully." });
+  } catch (err) {
+    console.error(err);
+    return handleErrorResponse(res, 500, err.message);
+  }
+};
+
+const savePost = async (req, res) => {
+  try {
+    const existingUser = await User.findOne({
+      _id: req.user._id,
+      saved: req.params.id,
+    });
+
+    if (existingUser) {
+      return handleErrorResponse(res, 400, "You have already saved this post.");
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { $push: { saved: req.params.id } },
+      { new: true }
+    );
+
+    if (!user) {
+      return handleErrorResponse(res, 400, "User does not exist.");
+    }
+
+    res.json({ msg: "Post saved successfully" });
+  } catch (err) {
+    console.error(err);
+    return handleErrorResponse(res, 500, err.message);
+  }
+};
+
+const unSavePost = async (req, res) => {
+  try {
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { $pull: { saved: req.params.id } },
+      { new: true }
+    );
+
+    if (!user) {
+      return handleErrorResponse(res, 400, "User does not exist.");
+    }
+
+    res.json({ msg: "Post removed from collection successfully." });
+  } catch (err) {
+    console.error(err);
+    return handleErrorResponse(res, 500, err.message);
+  }
+};
+
+const getSavePost = async (req, res) => {
+  try {
+    const features = new ApiFeatures(
+      Post.find({ _id: { $in: req.user.saved } }),
+      req.query
+    ).paginate();
+
+    const savePosts = await features.query.sort("-createdAt");
+
+    res.json({
+      savePosts,
+      result: savePosts.length,
+    });
+  } catch (err) {
+    console.error(err);
+    return handleErrorResponse(res, 500, err.message);
+  }
+};
+
 module.exports = {
   getPost,
   getPosts,
@@ -340,4 +449,8 @@ module.exports = {
   unlikePost,
   getUserLikedPosts,
   getUserLikes,
+  reportPost,
+  savePost,
+  unSavePost,
+  getSavePost,
 };
