@@ -65,6 +65,10 @@ app.use("/api/messages", messages);
 app.use("/email", email);
 app.use("/api/notify", notify);
 
+app.get("/", (req, res) => {
+  res.send(`<h3>Hey! ItsABlog Backend is up!</h3>`);
+});
+
 if (process.env.NODE_ENV == "production") {
   app.use(express.static(path.join(__dirname, "./static")));
 
